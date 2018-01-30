@@ -15,8 +15,12 @@ function geojson2dsv(geojson, delim, mixedGeometry) {
     .map(function(feature) {
       if (feature.geometry && feature.geometry.type === 'Point') {
         return Object.assign({}, feature.properties, {
-          lon: feature.geometry.coordinates[0],
-          lat: feature.geometry.coordinates[1]
+          geometry: `POINT(${feature.geometry.coordinates[1]} ${feature.geometry.coordinates[0]})`
+        });
+      }
+      if (feature.geometry && feature.geometry.type === 'LineString') {
+        return Object.assign({}, feature.properties, {
+          geometry: `LINESTRING(${lineStringCoords(feature)})`
         });
       }
       if (mixedGeometry) {
@@ -26,6 +30,14 @@ function geojson2dsv(geojson, delim, mixedGeometry) {
     .filter(Boolean);
 
   return dsvFormat(delim || ',').format(rows);
+}
+
+function lineStringCoords(feature) {
+  let coords = [];
+  feature.geometry.coordinates.forEach(function(element) {
+    coords.push(`${element[1]} ${element[0]}`); 
+  });
+  return coords.join(',');
 }
 
 module.exports = geojson2dsv;

@@ -8,7 +8,7 @@ test('geojson2dsv', function(t) {
         type: 'Point',
         coordinates: [0, 0]
       }),
-      'lon,lat\n0,0'
+      'geometry\nPOINT(0 0)'
     );
     t.end();
   });
@@ -21,7 +21,7 @@ test('geojson2dsv', function(t) {
         },
         ';'
       ),
-      'lon;lat\n0;0'
+      'geometry\nPOINT(0 0)'
     );
     t.end();
   });
@@ -37,7 +37,7 @@ test('geojson2dsv', function(t) {
           a: 'b'
         }
       }),
-      'a,lon,lat\nb,0,0'
+      'a,geometry\nb,POINT(0 0)'
     );
     t.end();
   });
@@ -58,11 +58,11 @@ test('geojson2dsv', function(t) {
           }
         ]
       }),
-      'a,lon,lat\nb,10,0'
+      'a,geometry\nb,POINT(0 10)'
     );
     t.end();
   });
-  t.test('encodes properties of non-points', function(t) {
+  t.test('encodes properties of LineString', function(t) {
     t.equal(
       geojson2dsv({
         type: 'FeatureCollection',
@@ -70,47 +70,16 @@ test('geojson2dsv', function(t) {
           {
             type: 'Feature',
             geometry: {
-              type: 'Polygon',
-              coordinates: [[10, 0]]
+              type: 'LineString',
+              coordinates: [[10, 0], [11, 0]]
             },
             properties: {
               a: 'b'
             }
           }
         ]
-      }, ',', true),
-      'a\nb'
-    );
-    t.end();
-  });
-  t.test('encodes properties of mixed geometry types', function(t) {
-    t.equal(
-      geojson2dsv({
-        type: 'FeatureCollection',
-        features: [
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [10, 0]
-            },
-            properties: {
-              a: 'x'
-            }
-          },
-          {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [[10, 0]]
-            },
-            properties: {
-              a: 'y'
-            }
-          }
-        ]
-      }, ',', true),
-      'a,lon,lat\nx,10,0\ny,,'
+      }),
+      'a,geometry\nb,"LINESTRING(0 10,0 11)"'
     );
     t.end();
   });
